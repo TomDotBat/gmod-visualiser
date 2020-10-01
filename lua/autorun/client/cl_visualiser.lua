@@ -9,6 +9,7 @@ sound.PlayURL("https://media1.vocaroo.com/mp3/1neQhwkCnaTP", "noblock mono", fun
 end)
 
 local bgCol = Color(30, 30, 30)
+local particleCol = Color(255, 255, 255, 150)
 local circleCol = Color(20, 20, 20)
 
 local circleRot = 0
@@ -20,6 +21,36 @@ local radPerBar = math.rad(degPerBar)
 
 local realBars = {}
 for i = 1, barCount do realBars[i] = 0 end
+
+local centerX, centerY = ScrW() * .5, ScrH() * .5
+local circleRadius = ScrH() * .2
+
+local particles = {}
+
+local function createParticle(initialSetup)
+    local direction = math.Rand(0, 360)
+    local directionRad = math.rad(direction)
+
+    if initialSetup then
+        table.insert(particles, {
+            x = centerX + math.sin(directionRad) * (circleRadius + math.Rand(0, ScrH() * .8)),
+            y = centerY + math.cos(directionRad) * (circleRadius + math.Rand(0, ScrH() * .8)),
+            direction = direction
+        })
+
+        return
+    end
+
+    table.insert(particles, {
+        x = centerX + math.sin(directionRad) * circleRadius,
+        y = centerY + math.cos(directionRad) * circleRadius,
+        direction = direction
+    })
+end
+
+for i = 1, 300 do
+    createParticle(true)
+end
 
 hook.Add("HUDPaint", "tom.visualiser", function()
     if not audioStream then return end --Get the current audio data
@@ -38,12 +69,31 @@ hook.Add("HUDPaint", "tom.visualiser", function()
 
     bassMultiplier = bassMultiplier * 50
 
-    local scrW, scrH = ScrW(), ScrH() --Draw the visualiser
+    local scrW, scrH = ScrW(), ScrH() --Draw the particles
+    centerX, centerY = scrW * .5, scrH * .5
+
     draw.RoundedBox(0, 0, 0, scrW, scrH, bgCol)
 
-    local centerX, centerY = scrW * .5, scrH * .5
+    local particleRadius = scrH * .0025
+    local particleDiameter = particleRadius * 2
 
-    local circleRadius = scrH * .2 + (bassMultiplier * scrH / 1080)
+    local particleSpeed = (FrameTime() + bassMultiplier * .02) * 10
+    local particleRemoved
+
+    for i = 1, #particles do
+        local particle = particles[i]
+        particle.x, particle.y = particle.x + math.sin(math.rad(particle.direction)) * particleSpeed, particle.y + math.cos(math.rad(particle.direction)) * particleSpeed
+        draw.RoundedBox(particleRadius, particle.x - particleRadius, particle.y - particleRadius, particleDiameter, particleDiameter, particleCol)
+
+        if particleRemoved then continue end
+        if particle.x < 0 or particle.y < 0 or particle.x > scrW or particle.y > scrH then
+            table.remove(particle, i)
+            createParticle()
+            particleRemoved = true
+        end
+    end
+
+    circleRadius = scrH * .2 + (bassMultiplier * scrH / 1080) --Draw the visualiser
     local circleDiameter = circleRadius * 2
 
     circleAccel = math.Approach(circleAccel, 2 + bassMultiplier * 3, FrameTime() * 500)
