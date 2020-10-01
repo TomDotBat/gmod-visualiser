@@ -36,7 +36,7 @@ hook.Add("HUDPaint", "tom.visualiser", function()
         bassMultiplier = bassMultiplier + bars[i]
     end
 
-    bassMultiplier = bassMultiplier * 30
+    bassMultiplier = bassMultiplier * 50
 
     local scrW, scrH = ScrW(), ScrH() --Draw the visualiser
     draw.RoundedBox(0, 0, 0, scrW, scrH, bgCol)
@@ -46,7 +46,7 @@ hook.Add("HUDPaint", "tom.visualiser", function()
     local circleRadius = scrH * .2 + (bassMultiplier * scrH / 1080)
     local circleDiameter = circleRadius * 2
 
-    circleAccel = math.Approach(circleAccel, 2 + bassMultiplier * 4, FrameTime() * 500)
+    circleAccel = math.Approach(circleAccel, 2 + bassMultiplier * 3, FrameTime() * 500)
     circleRot = circleRot + FrameTime() * circleAccel
 
     local circleRotRad = math.rad(circleRot)
