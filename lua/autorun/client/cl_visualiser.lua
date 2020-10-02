@@ -35,6 +35,7 @@ local function createParticle(initialSetup)
         table.insert(particles, {
             x = centerX + math.sin(directionRad) * (circleRadius + math.Rand(0, ScrH() * .8)),
             y = centerY + math.cos(directionRad) * (circleRadius + math.Rand(0, ScrH() * .8)),
+            speed = math.Rand(5, 15) / 10,
             direction = direction
         })
 
@@ -44,6 +45,7 @@ local function createParticle(initialSetup)
     table.insert(particles, {
         x = centerX + math.sin(directionRad) * circleRadius,
         y = centerY + math.cos(directionRad) * circleRadius,
+        speed = math.Rand(5, 15) / 10,
         direction = direction
     })
 end
@@ -77,11 +79,12 @@ hook.Add("HUDPaint", "tom.visualiser", function()
     local particleRadius = scrH * .0025
     local particleDiameter = particleRadius * 2
 
-    local particleSpeed = (FrameTime() + bassMultiplier * .02) * 10
+    local particleBaseSpeed = (FrameTime() + bassMultiplier * .02) * 10
     local particleRemoved
 
     for i = 1, #particles do
         local particle = particles[i]
+        local particleSpeed = particleBaseSpeed * particle.speed
         particle.x, particle.y = particle.x + math.sin(math.rad(particle.direction)) * particleSpeed, particle.y + math.cos(math.rad(particle.direction)) * particleSpeed
         draw.RoundedBox(particleRadius, particle.x - particleRadius, particle.y - particleRadius, particleDiameter, particleDiameter, particleCol)
 
