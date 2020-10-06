@@ -16,6 +16,8 @@ local circleCol = Color(20, 20, 20)
 local circleRot = 0
 local circleAccel = 0
 
+local particleAccel = 0
+
 local barCount = 64
 local bassBarCount = 16
 local degPerBar = 360 / barCount
@@ -78,15 +80,16 @@ hook.Add("HUDPaint", "tom.visualiser", function()
 
     draw.RoundedBox(0, 0, 0, scrW, scrH, bgCol)
 
+    particleAccel = math.Approach(particleAccel, (FrameTime() + bassMultiplier * .02) * 10, FrameTime() * 10)
+
     local particleRadius = scrH * .0025
     local particleDiameter = particleRadius * 2
 
-    local particleBaseSpeed = (FrameTime() + bassMultiplier * .02) * 10
     local particleRemoved
 
     for i = 1, #particles do
         local particle = particles[i]
-        local particleSpeed = particleBaseSpeed * particle.speed
+        local particleSpeed = particleAccel * particle.speed
         particle.x, particle.y = particle.x + math.sin(math.rad(particle.direction)) * particleSpeed, particle.y + math.cos(math.rad(particle.direction)) * particleSpeed
         draw.RoundedBox(particleRadius, particle.x - particleRadius, particle.y - particleRadius, particleDiameter, particleDiameter, particleCol)
 
