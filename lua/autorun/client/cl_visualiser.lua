@@ -8,6 +8,7 @@ sound.PlayURL("https://media1.vocaroo.com/mp3/1neQhwkCnaTP", "noblock mono", fun
     audioStream = stream
 end)
 
+
 local bgCol = Color(30, 30, 30)
 local particleCol = Color(255, 255, 255, 150)
 local circleCol = Color(20, 20, 20)
@@ -16,6 +17,7 @@ local circleRot = 0
 local circleAccel = 0
 
 local barCount = 64
+local bassBarCount = 16
 local degPerBar = 360 / barCount
 local radPerBar = math.rad(degPerBar)
 
@@ -65,8 +67,8 @@ hook.Add("HUDPaint", "tom.visualiser", function()
     end
 
     local bassMultiplier = 0
-    for i = 1, 20 do
-        bassMultiplier = bassMultiplier + bars[i]
+    for i = 1, bassBarCount do
+        bassMultiplier = bassMultiplier + bars[i] * (Lerp(i / bassBarCount, 1.5, .2))
     end
 
     bassMultiplier = bassMultiplier * 50
